@@ -128,13 +128,11 @@
       console.log('送信するデータ（JSON）:', answerData);
 
       // ★ ここで Cloudflare Workers（API）へ fetch(POST) して送信します
-      /*
-      fetch('https://your-workers-url.workers.dev/api/submit', {
+      fetch('my-survey.toko-digital-lab.workers.dev/api/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(answerData)
       }).then(...)
-      */
 
       alert('アンケートを送信しました！（コンソールログを確認してください）');
     }
