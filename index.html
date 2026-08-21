@@ -115,7 +115,6 @@
       // 送信データをJSONオブジェクトにまとめる
       formData.forEach((value, key) => {
         if (answerData[key]) {
-          // チェックボックスなど複数値がある場合は配列化
           if (!Array.isArray(answerData[key])) {
             answerData[key] = [answerData[key]];
           }
@@ -125,16 +124,24 @@
         }
       });
 
-      console.log('送信するデータ（JSON）:', answerData);
-
-      // ★ ここで Cloudflare Workers（API）へ fetch(POST) して送信します
-      fetch('my-survey.toko-digital-lab.workers.dev/api/submit', {
+      // ★ 修正済み：Workersへ送信する処理
+      fetch('https://my-survey.toko-digital-lab.workers.dev', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(answerData)
-      }).then(...)
-
-      alert('アンケートを送信しました！（コンソールログを確認してください）');
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('アンケートの送信が完了しました！');
+        } else {
+          alert('送信に失敗しました: ' + (data.error || '不明なエラー'));
+        }
+      })
+      .catch(err => {
+        console.error('送信エラー:', err);
+        alert('通信エラーが発生しました');
+      });
     }
   </script>
 </body>
