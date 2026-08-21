@@ -1,18 +1,25 @@
 export default {
   async fetch(request, env) {
-    // CORS設定（Pagesからの通信を許可）
+    // どのサイトからの通信も許可するヘッダーを設定
     const corsHeaders = {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
     };
 
+    // ブラウザからの事前送信テスト（OPTIONSリクエスト）に成功を返す
     if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: corsHeaders });
+      return new Response(null, { 
+        status: 204,
+        headers: corsHeaders 
+      });
     }
 
     if (request.method !== 'POST') {
-      return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+      return new Response('Method Not Allowed', { 
+        status: 405, 
+        headers: corsHeaders 
+      });
     }
 
     try {
@@ -20,7 +27,7 @@ export default {
       const body = await request.json();
       const answersJsonString = JSON.stringify(body);
 
-      // バインドした env.DB（survey-db）へ保存
+      // D1データベース（DB）へ保存
       await env.DB.prepare(
         'INSERT INTO survey_responses (answers_json) VALUES (?)'
       )
