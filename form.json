@@ -1,6 +1,6 @@
 {
-  "title": "サービス改善アンケート",
-  "description": "ご意見をお聞かせください（所要時間：約2分）",
+  "title": "テストアンケート",
+  "description": "動作確認用のアンケートです",
   "questions": [
     {
       "id": "q1_name",
@@ -8,47 +8,6 @@
       "type": "text",
       "placeholder": "山田 太郎",
       "required": true
-    },
-    {
-      "id": "q2_age",
-      "label": "年代を選択してください",
-      "type": "select",
-      "required": true,
-      "options": [
-        { "label": "10代", "value": "10s" },
-        { "label": "20代", "value": "20s" },
-        { "label": "30代", "value": "30s" },
-        { "label": "40代以上", "value": "40s_plus" }
-      ]
-    },
-    {
-      "id": "q3_satisfaction",
-      "label": "サービスの満足度はいかがですか？",
-      "type": "radio",
-      "required": true,
-      "options": [
-        { "label": "満足", "value": "satisfied" },
-        { "label": "普通", "value": "neutral" },
-        { "label": "不満", "value": "unsatisfied" }
-      ]
-    },
-    {
-      "id": "q4_features",
-      "label": "よく使う機能をすべて選んでください（複数選択可）",
-      "type": "checkbox",
-      "required": false,
-      "options": [
-        { "label": "検索機能", "value": "search" },
-        { "label": "お気に入り", "value": "favorite" },
-        { "label": "通知機能", "value": "notification" }
-      ]
-    },
-    {
-      "id": "q5_feedback",
-      "label": "ご意見・ご要望（自由記述）",
-      "type": "textarea",
-      "placeholder": "こちらにご自由にご記入ください",
-      "required": false
     }
   ]
 }
