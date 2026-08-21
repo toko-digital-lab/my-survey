@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>動的アンケートフォーム</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-weight: bold; margin-bottom: 5px; }
+    input[type="text"], textarea, select { width: 100%; padding: 8px; box-sizing: border-box; }
+    .option-label { font-weight: normal; display: inline-block; margin-right: 15px; }
+    .required { color: red; margin-left: 4px; }
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <!-- アンケート描画用のコンテナ -->
+  <div id="survey-container">
+    <p>読み込み中...</p>
+  </div>
+
+  <script>
+    // 1. fetch で form.json を読み込む
+    fetch('./form.json')
+      .then(response => {
+        if (!response.ok) throw new Error('JSONの読み込みに失敗しました');
+        return response.json();
+      })
+      .then(data => {
+        // 2. 受け取ったJSONからフォームをレンダリングする
+        renderSurvey(data);
+      })
+      .catch(error => {
+        console.error('エラー:', error);
+        document.getElementById('survey-container').innerHTML = '<p>エラーが発生しました。</p>';
+      });
+
+    // フォームを画面に動的生成する関数
+    function renderSurvey(data) {
+      const container = document.getElementById('survey-container');
+      
+      // タイトルと説明文を設定
+      let html = `
+        <h1>${data.title}</h1>
+        <p>${data.description}</p>
+        <form id="survey-form">
+      `;
+
+      // 3. questions 配列をループして各設問のHTMLを作る
+      data.questions.forEach(q => {
+        const requiredBadge = q.required ? '<span class="required">*</span>' : '';
+        
+        html += `<div class="form-group">`;
+        html += `<label>${q.label}${requiredBadge}</label>`;
+
+        // type の種類に応じて表示するタグを分岐
+        switch (q.type) {
+          case 'text':
+            html += `<input type="text" name="${q.id}" placeholder="${q.placeholder || ''}" ${q.required ? 'required' : ''}>`;
+            break;
+
+          case 'textarea':
+            html += `<textarea name="${q.id}" rows="4" placeholder="${q.placeholder || ''}" ${q.required ? 'required' : ''}></textarea>`;
+            break;
+
+          case 'select':
+            html += `<select name="${q.id}" ${q.required ? 'required' : ''}>`;
+            html += `<option value="">選択してください</option>`;
+            q.options.forEach(opt => {
+              html += `<option value="${opt.value}">${opt.label}</option>`;
+            });
+            html += `</select>`;
+            break;
+
+          case 'radio':
+            q.options.forEach(opt => {
+              html += `
+                <label class="option-label">
+                  <input type="radio" name="${q.id}" value="${opt.value}" ${q.required ? 'required' : ''}>
+                  ${opt.label}
+                </label>`;
+            });
+            break;
+
+          case 'checkbox':
+            q.options.forEach(opt => {
+              html += `
+                <label class="option-label">
+                  <input type="checkbox" name="${q.id}" value="${opt.value}">
+                  ${opt.label}
+                </label>`;
+            });
+            break;
+        }
+
+        html += `</div>`;
+      });
+
+      html += `<button type="submit">送信する</button></form>`;
+      container.innerHTML = html;
+
+      // 4. フォーム送信時のイベント処理を設定
+      document.getElementById('survey-form').addEventListener('submit', handleFormSubmit);
+    }
+
+    // フォーム送信時の処理（Workers APIに送信する部分）
+    function handleFormSubmit(event) {
+      event.preventDefault(); // 画面リロードを防止
+
+      const formData = new FormData(event.target);
+      const answerData = {};
+
+      // 送信データをJSONオブジェクトにまとめる
+      formData.forEach((value, key) => {
+        if (answerData[key]) {
+          // チェックボックスなど複数値がある場合は配列化
+          if (!Array.isArray(answerData[key])) {
+            answerData[key] = [answerData[key]];
+          }
+          answerData[key].push(value);
+        } else {
+          answerData[key] = value;
+        }
+      });
+
+      console.log('送信するデータ（JSON）:', answerData);
+
+      // ★ ここで Cloudflare Workers（API）へ fetch(POST) して送信します
+      /*
+      fetch('https://your-workers-url.workers.dev/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(answerData)
+      }).then(...)
+      */
+
+      alert('アンケートを送信しました！（コンソールログを確認してください）');
+    }
+  </script>
+</body>
+</html>
