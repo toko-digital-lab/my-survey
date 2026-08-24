@@ -1,0 +1,10 @@
+# Workerの名前（任意ですが、今のWorker名に合わせると良いです）
+name = "my-survey"
+main = "index.js"
+compatibility_date = "2024-01-01"
+
+# D1データベースのバインド設定
+[[d1_databases]]
+binding = "DB"
+database_name = "survey-dbtest"
+database_id = "c43e667a-673b-444a-b2eb-517c9c66ad25"
